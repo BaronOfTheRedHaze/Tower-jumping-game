@@ -18,6 +18,8 @@ public class PlayerControls : MonoBehaviour
     public float JumpPower { get; set; } = 5f;
     public Rigidbody2D RB { get; set; }
 
+    bool InCollision = false;
+
 
     private void Awake()
     {
@@ -36,7 +38,7 @@ public class PlayerControls : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         rb.velocity = new Vector2(horizontal * Speed, rb.velocity.y);
     }
@@ -65,6 +67,34 @@ public class PlayerControls : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
         }
 
+    }
+
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Platform" && IsGrounded())
+        {
+            InCollision = true;
+            Speed = 9f;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Platform" && IsGrounded())
+        {
+            InCollision = false;
+            StartCoroutine(NormSpeed());
+        }
+    }
+
+    IEnumerator NormSpeed()
+    {
+        yield return new WaitForSeconds(1);
+        if (!InCollision)
+        {
+            Speed = 3f;
+        }
     }
 
 }
